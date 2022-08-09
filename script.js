@@ -1,48 +1,55 @@
 const gameBoard = (() => {
     let grid = ['', '', '', '', '', '', '', '', ''];
-    const gotWinner = () => (gameBoard.grid[0] === gameBoard.grid[1] === gameBoard.grid[2]) &&
-    gameBoard.grid[0] !== '';
-    const gameOver = () => gameBoard.grid[0] === gameBoard.grid[1] === gameBoard.grid[2];
-    const clearGrid = () => {
-        gameBoard.grid = ['', '', '', '', '', '', '', '', ''];
-        //remove from here
-        displayController.render(gameBoard.grid);
-    };
-    //getgrid instead of grid?????
-    return {grid, gotWinner, gameOver, clearGrid};
+    const clearGrid = () => gameBoard.grid = ['', '', '', '', '', '', '', '', ''];
+    return {grid, clearGrid};
 })()
 
 const displayController = (() => {
     const gridItems = document.querySelectorAll('.grid-item');
+    const restart = document.querySelector('button');
+
     const render = (grid) => gridItems.forEach(item => item.textContent = grid[item.dataset.index]);
+    
+    restart.addEventListener('click', () => {
+        gameBoard.clearGrid();
+        displayController.render(gameBoard.grid);
+    });
     return {render, gridItems};
 })()
 
 const Player = (mark) => {
-    const test = document.querySelector('.test');
     const makeMove = (e) => {
         if(typeof gameBoard.grid[e.target.dataset.index] !== 'null') {
             gameBoard.grid.splice(e.target.dataset.index, 1, mark);
             //remove from here
             displayController.render(gameBoard.grid);
         }  
-        if(gameBoard.gotWinner) {
-            test.style.backgroundColor = 'red';
-        } 
     };
-    return {makeMove};
+    const getMark = () => mark;
+    return {makeMove, getMark};
 }
 
-const player1 = Player('x');
-const player2 = Player('o');
+const gameController = (() => {
+    const player1 = Player('x');
+    const player2 = Player('o');
+    let round = 1;
 
-displayController.gridItems.forEach(item => item.addEventListener('click', player1.makeMove));
+    const getCurrentPlayer = () => {
+        return round % 2 === 1? player1 : player2;
+    };
 
-displayController.render(gameBoard.grid);
+    const playRound = (e) => {
+        getCurrentPlayer().makeMove(e);
+        round++;
+    };
 
-const restart = document.querySelector('button');
-restart.addEventListener('click', gameBoard.clearGrid);
-
+    displayController.gridItems.forEach(item => item.addEventListener('click', playRound));
+    
+    //const gotWinner = () => (gameBoard.grid[0] === gameBoard.grid[1] === gameBoard.grid[2]) &&
+    //gameBoard.grid[0] !== '';
+    //const gameOver = () => gameBoard.grid[0] === gameBoard.grid[1] === gameBoard.grid[2];
+    return {playRound};
+})()
 
 // grid-items add event listener for click => displ.game => if array empty - player1.move, else if last mark was x, then o
 // DONE 1. gameboard array splice? based on data-attr, return array
