@@ -95,7 +95,10 @@ const gameController = (() => {
         return round === 9;
     };
 
-    const resetCounter = () => round = 1;
+    const resetCounter = () => {
+        round = 1;
+        isOver = false;
+    };
 
     return {playRound, getCurrentPlayer, resetCounter, getIsOver};
 })()
