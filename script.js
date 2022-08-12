@@ -11,10 +11,17 @@ const displayController = (() => {
     const restart = document.querySelector('button');
     
     const render = (grid) => gridItems.forEach(item => item.textContent = grid[item.dataset.index]);
-    //add restart with corr message, and winner
-    const updateMessage = () => message.textContent = `Player ${gameController.getCurrentPlayer().getMark()}'s turn`;
     
+    const updateMessage = () => {
+        if(gameController.getIsOver()) {
+            message.textContent = `Player ${gameController.getCurrentPlayer().getMark()} won!`;
+        } else {
+            message.textContent = `Player ${gameController.getCurrentPlayer().getMark()}'s turn`;
+        }   
+    };
+ 
     gridItems.forEach(item => item.addEventListener('click', (e) => {
+        if(gameController.getIsOver()) return;
         gameController.playRound(e.target.dataset.index);
         displayController.render(gameBoard.grid);
         displayController.updateMessage(); 
@@ -40,6 +47,7 @@ const gameController = (() => {
     const player1 = Player('X');
     const player2 = Player('O');
     let round = 1;
+    let isOver = false;
 
     const getCurrentPlayer = () => {
         return round % 2 === 1? player1 : player2;
@@ -51,10 +59,11 @@ const gameController = (() => {
             gameBoard.grid.splice(index, 1, getCurrentPlayer().getMark());            
         }
         if(checkWinner(index))  {
-            console.log('winner');
+            isOver = true;
             return;
         } 
         if(gameOver()) {
+            isOver = true;
             round = 1;
             console.log('gameover');
             return;
@@ -77,9 +86,10 @@ const gameController = (() => {
         return winOptions
         .some(combination => combination
             .every(index => gameBoard.grid[index] === getCurrentPlayer().getMark())
-        );
-      
+        );    
     }
+
+    const getIsOver = () => isOver;
 
     const gameOver = () => {
         return round === 9;
@@ -87,9 +97,5 @@ const gameController = (() => {
 
     const resetCounter = () => round = 1;
 
-    return {playRound, getCurrentPlayer, resetCounter};
+    return {playRound, getCurrentPlayer, resetCounter, getIsOver};
 })()
-
-
-// displaycontroller.message update counter and who is the winner 
-
