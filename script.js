@@ -13,7 +13,9 @@ const displayController = (() => {
     const render = (grid) => gridItems.forEach(item => item.textContent = grid[item.dataset.index]);
     
     const updateMessage = () => {
-        if(gameController.getIsOver()) {
+        if (gameController.getIsOver() && gameController.getTie()) {
+            message.textContent = `It's a tie!`;
+        } else if (gameController.getIsOver()) {
             message.textContent = `Player ${gameController.getCurrentPlayer().getMark()} won!`;
         } else {
             message.textContent = `Player ${gameController.getCurrentPlayer().getMark()}'s turn`;
@@ -23,18 +25,18 @@ const displayController = (() => {
     gridItems.forEach(item => item.addEventListener('click', (e) => {
         if(gameController.getIsOver()) return;
         gameController.playRound(e.target.dataset.index);
-        displayController.render(gameBoard.grid);
-        displayController.updateMessage(); 
+        render(gameBoard.grid);
+        updateMessage(); 
     }));
 
     restart.addEventListener('click', () => {
         gameBoard.clearGrid();
         gameController.resetCounter();
-        displayController.render(gameBoard.grid);
-        displayController.updateMessage();       
+        render(gameBoard.grid);
+        updateMessage();       
     });
     
-    return {render, gridItems, updateMessage};
+    return {};
 })()
 
 const Player = (mark) => {
@@ -48,6 +50,7 @@ const gameController = (() => {
     const player2 = Player('O');
     let round = 1;
     let isOver = false;
+    let tie = false;
 
     const getCurrentPlayer = () => {
         return round % 2 === 1? player1 : player2;
@@ -64,6 +67,7 @@ const gameController = (() => {
         } 
         if(gameOver()) {
             isOver = true;
+            tie = true;
             round = 1;
             console.log('gameover');
             return;
@@ -90,6 +94,8 @@ const gameController = (() => {
     }
 
     const getIsOver = () => isOver;
+    
+    const getTie = () => tie;
 
     const gameOver = () => {
         return round === 9;
@@ -100,5 +106,5 @@ const gameController = (() => {
         isOver = false;
     };
 
-    return {playRound, getCurrentPlayer, resetCounter, getIsOver};
+    return {playRound, getCurrentPlayer, resetCounter, getIsOver, getTie};
 })()
