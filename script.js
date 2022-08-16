@@ -103,6 +103,7 @@ const gameController = (() => {
 
     const resetCounter = () => {
         round = 1;
+        tie = false;
         isOver = false;
     };
 
